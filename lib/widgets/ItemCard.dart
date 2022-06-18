@@ -18,33 +18,26 @@ class ItemCard extends StatelessWidget {
             color: Colors.white), // TODO: Put icon to the right, I'm lazy lol
       ),
       onDismissed: (direction) {
+        final index = ClientSocket().getIndexOfItem(item);
         ClientSocket().sendRemoveItem(item);
-      },
-      confirmDismiss: (_) async {
-        bool cancelled = false;
-
-        final sb = SnackBar(
+        final snackBar = SnackBar(
           content: Text("¿Quieres cancelar la acción?"),
           action: SnackBarAction(
             label: "Cancelar",
-            onPressed: () => (cancelled = true),
+            onPressed: () => {ClientSocket().sendAddItem(item.name, index)},
           ),
         );
-
-        ScaffoldMessenger.of(context).showSnackBar(sb);
-
-        await Future.delayed(const Duration(seconds: 3));
-
-        return !cancelled;
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
       },
-      child: Card(
-        child: Column(
-          children: [
-            ListTile(
+      child: Padding(
+        padding: const EdgeInsets.all(2.0),
+        child: Card(
+          child: Container(
+            padding: EdgeInsets.only(left: 2, right: 2, top: 5, bottom: 5),
+            child: ListTile(
               title: Text(item.name),
-              subtitle: Text(item.addedBy),
             ),
-          ],
+          ),
         ),
       ),
     );

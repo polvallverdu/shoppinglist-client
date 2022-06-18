@@ -19,4 +19,20 @@ class Settings {
   static setName(String name) {
     DBClient.settingsBox.put('name', name);
   }
+
+  static isRemember() {
+    return DBClient.settingsBox.get('remember', defaultValue: false);
+  }
+
+  static setRemember(bool remember) {
+    DBClient.settingsBox.put('remember', remember);
+  }
+
+  static getRememberedPassword() {
+    return DBClient.settingsBox.get('password', defaultValue: "");
+  }
+
+  static setRememberedPassword(String password) {
+    DBClient.settingsBox.put('password', password);
+  }
 }

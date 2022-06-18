@@ -1,8 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shoppinglistclient/localDb/DBClient.dart';
 import 'package:shoppinglistclient/net/socket.dart';
 import 'package:shoppinglistclient/screens/HomeScreen.dart';
+import 'package:shoppinglistclient/screens/LoadingScreen.dart';
+import 'package:shoppinglistclient/screens/PasswordScreen.dart';
+import 'package:shoppinglistclient/widgets/SocketStatusDisplay.dart';
 
 void main() async {
   await DBClient.init();
@@ -10,17 +15,41 @@ void main() async {
   runApp(ProviderScope(child: MyApp()));
 }
 
-class MyApp extends HookConsumerWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final socketStatus = ref.watch(ClientSocket().socketStatusProvider);
+
+    Widget screen = HomeScreen();
+    switch (socketStatus) {
+      case SocketStatus.CONNECTED:
+        screen = PasswordScreen();
+        break;
+      case SocketStatus.LOGGED:
+        screen = HomeScreen();
+        break;
+      default:
+        screen = LoadingScreen();
+        break;
+    }
+
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: HomeScreen(),
+      home: Scaffold(
+        body: Stack(
+          children: [
+            Container(
+              child: screen,
+            ),
+            SocketStatusDisplay(),
+          ],
+        ),
+      ),
     );
   }
 }
