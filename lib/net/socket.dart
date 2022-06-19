@@ -10,6 +10,7 @@ import 'package:shoppinglistclient/net/notifiers/ItemsListNotifier.dart';
 import 'package:shoppinglistclient/net/notifiers/SocketStatusNotifier.dart';
 import 'package:web_socket_channel/status.dart' as status;
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 enum MessageType {
   CONNECTED,
@@ -95,10 +96,6 @@ class ClientSocket {
 
   ClientSocket._internal();
 
-  void test(dynamic test) {
-    print(test);
-  }
-
   void _handleMessage(dynamic rawmessage) {
     var demsg = json.decode(rawmessage);
     final message = Message.fromJson(demsg);
@@ -140,7 +137,9 @@ class ClientSocket {
 
     socketStatusNotifier.setStatus(SocketStatus.CONNECTING);
 
-    channel = WebSocketChannel.connect(Uri.parse('ws://192.168.1.41:3000'));
+    final url = dotenv.get("WEBSOCKET_URL", fallback: "ws://localhost:3000");
+    print(url);
+    channel = WebSocketChannel.connect(Uri.parse(url));
     channel!.stream.listen(_handleMessage,
         cancelOnError: true,
         onDone: () => disconnect(true),

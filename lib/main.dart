@@ -8,8 +8,10 @@ import 'package:shoppinglistclient/screens/HomeScreen.dart';
 import 'package:shoppinglistclient/screens/LoadingScreen.dart';
 import 'package:shoppinglistclient/screens/PasswordScreen.dart';
 import 'package:shoppinglistclient/widgets/SocketStatusDisplay.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
+  await dotenv.load(fileName: ".env");
   await DBClient.init();
   ClientSocket().connect();
   runApp(ProviderScope(child: MyApp()));
