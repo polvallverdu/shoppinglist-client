@@ -124,12 +124,11 @@ class ClientSocket {
       case MessageType.REORDER_ITEM:
         itemNotifier.changeIndex(message.data!['uuid'], message.data!['index']);
         break;
-      case MessageType.DISCONNECT:
-        connected = false;
-        socketStatusNotifier.setStatus(SocketStatus.DISCONNECTED);
-        break;
       case MessageType.PING:
         sendPong();
+        break;
+      case MessageType.DISCONNECT:
+        disconnect(true);
         break;
     }
   }
