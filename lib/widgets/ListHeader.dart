@@ -32,6 +32,7 @@ class ListHeader extends StatelessWidget {
                   icon: Icon(Icons.clear),
                 ),
               ),
+              keyboardType: TextInputType.name,
               onSubmitted: (_) => _add(),
             ),
           ),
