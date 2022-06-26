@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shoppinglistclient/net/socket.dart';
+import 'package:stroke_text/stroke_text.dart';
 
 class SocketStatusDisplay extends HookConsumerWidget {
   const SocketStatusDisplay({Key? key}) : super(key: key);
 
-  final Duration duration = const Duration(milliseconds: 300);
+  final Duration duration = const Duration(seconds: 1);
   static double beginPoint = -100;
   static double endPoint = 0;
 
@@ -48,11 +49,17 @@ class SocketStatusDisplay extends HookConsumerWidget {
             color: socketStatus.color,
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Text(
-            socketStatus.message,
-            style: TextStyle(
-              fontSize: 20,
-              color: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: Center(
+              child: Text(
+                socketStatus.message,
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.black,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
             ),
           ),
         ),
