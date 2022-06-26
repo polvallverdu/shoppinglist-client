@@ -103,7 +103,7 @@ class HomeScreen extends ConsumerWidget {
                 child: ListHeader(),
               ),
               Container(
-                height: height * 0.9,
+                height: height * 0.85,
                 child: ReorderableListView(
                   onReorder: (old, newIndex) {
                     s.sendIndexChange(items[old], newIndex);
