@@ -127,6 +127,10 @@ class ClientSocket {
       case MessageType.DISCONNECT:
         connected = false;
         socketStatusNotifier.setStatus(SocketStatus.DISCONNECTED);
+        break;
+      case MessageType.PING:
+        sendPong();
+        break;
     }
   }
 
@@ -165,8 +169,9 @@ class ClientSocket {
     Future.delayed(const Duration(seconds: 5), connect);
   }
 
-  void sendPing() async {
-    sendMessage(MessageType.PING);
+  void sendPong() async {
+    sendMessage(
+        MessageType.PONG, {"timestamp": DateTime.now().millisecondsSinceEpoch});
   }
 
   Future<void> sendAuth(String password) async {
