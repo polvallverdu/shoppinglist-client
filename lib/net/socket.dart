@@ -141,13 +141,11 @@ class ClientSocket {
     socketStatusNotifier.setStatus(SocketStatus.CONNECTING);
 
     final url = dotenv.get("WEBSOCKET_URL", fallback: "ws://localhost:3000");
-    print(url);
     channel = WebSocketChannel.connect(Uri.parse(url));
     channel!.stream.listen(_handleMessage,
         cancelOnError: true,
         onDone: () => disconnect(true),
         onError: (e) {
-          print('here: $e');
           socketStatusNotifier.setStatus(SocketStatus.FAILED_CONNECTION);
           Future.delayed(const Duration(seconds: 5), connect);
         });
