@@ -124,6 +124,10 @@ class ClientSocket {
       case MessageType.REORDER_ITEM:
         itemNotifier.changeIndex(message.data!['uuid'], message.data!['index']);
         break;
+      case MessageType.UPDATE_ITEM:
+        itemNotifier.changeItem(
+            message.data!['uuid'], message.data!['newName']);
+        break;
       case MessageType.PING:
         sendPong();
         break;
@@ -178,6 +182,13 @@ class ClientSocket {
 
   Future<void> sendNameChange(String newName) async {
     await sendMessage(MessageType.NAME_CHANGE, {'name': newName});
+  }
+
+  Future<void> sendItemChange(Item item, String newName) async {
+    await sendMessage(MessageType.UPDATE_ITEM, {
+      'uuid': item.uuid,
+      'name': newName,
+    });
   }
 
   Future<void> sendAddItem(String name, [int index = 0]) async {

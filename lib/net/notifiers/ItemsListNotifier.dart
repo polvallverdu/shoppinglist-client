@@ -30,4 +30,14 @@ class ItemsListNotifier extends StateNotifier<List<Item>> {
     newState.insert(newIndex, item);
     state = newState;
   }
+
+  void changeItem(String uuid, String newName) {
+    state = [
+      for (var item in state)
+        if (item.uuid == uuid)
+          Item(uuid, newName, item.addedBy, item.timestamp)
+        else
+          item
+    ];
+  }
 }
