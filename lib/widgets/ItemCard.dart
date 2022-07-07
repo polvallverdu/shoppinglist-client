@@ -64,22 +64,40 @@ class ItemCard extends StatelessWidget {
     return Slidable(
       key: Key(item.uuid),
       startActionPane: ActionPane(
-        motion: const BehindMotion(),
+        motion: const DrawerMotion(),
         dismissible: DismissiblePane(onDismissed: () => _onDismiss(context)),
+        extentRatio: 0.001,
+        openThreshold: 0.1,
         children: [
           SlidableAction(
             onPressed: (_) => _onDismiss(_),
             backgroundColor: Colors.red[700]!,
             foregroundColor: Colors.white,
             icon: Icons.delete,
-            label: "Borrar",
+          )
+        ],
+      ),
+      endActionPane: ActionPane(
+        motion: const BehindMotion(),
+        dragDismissible: false,
+        children: [
+          SlidableAction(
+            onPressed: (_) => _onDismiss(_),
+            backgroundColor: Colors.red[700]!,
+            foregroundColor: Colors.white,
+            icon: Icons.delete,
           ),
           SlidableAction(
             onPressed: (_) => "TODO",
             backgroundColor: Colors.grey[850]!,
             foregroundColor: Colors.white,
             icon: Icons.question_mark,
-            label: "No había",
+          ),
+          SlidableAction(
+            onPressed: (_) => _openEditScreen(_),
+            backgroundColor: Colors.blue[900]!,
+            foregroundColor: Colors.white,
+            icon: Icons.edit,
           )
         ],
       ),
