@@ -1,4 +1,4 @@
-package com.example.shoppinglistclient
+package engineer.pol.shoppinglistclient
 
 import io.flutter.embedding.android.FlutterActivity
 
