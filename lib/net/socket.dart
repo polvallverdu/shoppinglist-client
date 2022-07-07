@@ -187,7 +187,7 @@ class ClientSocket {
   Future<void> sendItemChange(Item item, String newName) async {
     await sendMessage(MessageType.REQUEST_UPDATE_ITEM, {
       'uuid': item.uuid,
-      'name': newName,
+      'newName': newName,
     });
   }
 
