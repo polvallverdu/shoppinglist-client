@@ -4,7 +4,7 @@ import 'package:shoppinglistclient/net/socket.dart';
 class ListHeader extends StatelessWidget {
   ListHeader({Key? key}) : super(key: key);
 
-  TextEditingController _controller = TextEditingController(text: "");
+  TextEditingController _controller = TextEditingController();
 
   _add() {
     ClientSocket().sendAddItem(_controller.text);
