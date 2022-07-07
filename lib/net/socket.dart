@@ -185,7 +185,7 @@ class ClientSocket {
   }
 
   Future<void> sendItemChange(Item item, String newName) async {
-    await sendMessage(MessageType.UPDATE_ITEM, {
+    await sendMessage(MessageType.REQUEST_UPDATE_ITEM, {
       'uuid': item.uuid,
       'name': newName,
     });
@@ -194,10 +194,6 @@ class ClientSocket {
   Future<void> sendAddItem(String name, [int index = 0]) async {
     await sendMessage(MessageType.REQUEST_ADD_ITEM,
         {'name': name, 'addedBy': Settings.getName(), 'index': index});
-  }
-
-  Future<void> sendUpdateItem(Item item) async {
-    await sendMessage(MessageType.REQUEST_UPDATE_ITEM, {'item': item.toJson()});
   }
 
   Future<void> sendRemoveItem(Item item) async {
