@@ -17,7 +17,8 @@ class SocketStatusDisplay extends HookConsumerWidget {
         duration: duration,
         lowerBound: beginPoint,
         upperBound: endPoint,
-        initialValue: beginPoint);
+        initialValue: beginPoint,
+        animationBehavior: AnimationBehavior.preserve);
     final socketStatus = ref.watch(ClientSocket().socketStatusProvider);
 
     switch (socketStatus) {
