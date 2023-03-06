@@ -96,20 +96,35 @@ class HomeScreen extends ConsumerWidget {
             ),
             Container(
               height: height * 0.85,
-              child: ReorderableListView(
+              child: ReorderableListView.builder(
                 onReorder: (old, newIndex) {
                   s.sendIndexChange(items[old], newIndex);
                   ref
                       .read(s.itemsProvider.notifier)
                       .changeIndex(items[old].uuid, newIndex);
                 },
-                children: items
-                    .map((e) => ItemCard(
-                          item: e,
-                          key: Key(e.uuid),
-                        ))
-                    .toList(),
+                itemCount: items.length,
+                itemBuilder: (context, index) {
+                  return ItemCard(
+                    item: items[index],
+                    key: Key(items[index].uuid),
+                  );
+                },
               ),
+              // child: ReorderableListView(
+              //   onReorder: (old, newIndex) {
+              //     s.sendIndexChange(items[old], newIndex);
+              //     ref
+              //         .read(s.itemsProvider.notifier)
+              //         .changeIndex(items[old].uuid, newIndex);
+              //   },
+              //   children: items
+              //       .map((e) => ItemCard(
+              //             item: e,
+              //             key: Key(e.uuid),
+              //           ))
+              //       .toList(),
+              // ),
             ),
           ],
         ));
