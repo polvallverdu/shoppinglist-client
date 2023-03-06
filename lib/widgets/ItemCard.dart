@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:shoppinglistclient/consts.dart';
 import 'package:shoppinglistclient/net/Item.dart';
 import 'package:shoppinglistclient/net/socket.dart';
 
@@ -59,8 +60,29 @@ class ItemCard extends StatelessWidget {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
+  bool _isNotFound() {
+    if (item.notFound == null) {
+      return false;
+    } else {
+      return DateTime.now().difference(item.notFound!).inHours < 24;
+    }
+  }
+
+  void _onNotFound() {
+    ClientSocket().sendItemNotFound(item, !_isNotFound());
+  }
+
   @override
   Widget build(BuildContext context) {
+    final bool notFound;
+
+    // item.notFound is a DateTime. If it's null, notFound is false. if it's been 24 hours since the item was marked as not found, notFound is false. Otherwise, notFound is true.
+    if (item.notFound == null) {
+      notFound = false;
+    } else {
+      notFound = DateTime.now().difference(item.notFound!).inHours < 24;
+    }
+
     return Slidable(
       key: Key(item.uuid),
       startActionPane: ActionPane(
@@ -88,8 +110,8 @@ class ItemCard extends StatelessWidget {
             icon: Icons.delete,
           ),
           SlidableAction(
-            onPressed: (_) => "TODO",
-            backgroundColor: Colors.grey[850]!,
+            onPressed: (_) => _onNotFound(),
+            backgroundColor: ConstColors.notfound,
             foregroundColor: Colors.white,
             icon: Icons.question_mark,
           ),
@@ -104,6 +126,7 @@ class ItemCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(2.0),
         child: Card(
+          color: notFound ? ConstColors.notfound : Colors.white,
           child: InkWell(
             onTap: () => _openEditScreen(context),
             child: Container(

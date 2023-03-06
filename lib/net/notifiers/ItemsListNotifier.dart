@@ -35,7 +35,18 @@ class ItemsListNotifier extends StateNotifier<List<Item>> {
     state = [
       for (var item in state)
         if (item.uuid == uuid)
-          Item(uuid, newName, item.addedBy, item.timestamp)
+          Item(uuid, newName, item.addedBy, item.timestamp, item.notFound)
+        else
+          item
+    ];
+  }
+
+  void itemNotFound(String uuid, bool notFound) {
+    state = [
+      for (var item in state)
+        if (item.uuid == uuid)
+          Item(uuid, item.name, item.addedBy, item.timestamp,
+              notFound ? DateTime.now() : null)
         else
           item
     ];
