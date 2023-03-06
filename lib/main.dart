@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shoppinglistclient/localDb/DBClient.dart';
 import 'package:shoppinglistclient/net/socket.dart';
+import 'package:shoppinglistclient/screens/CacheScreen.dart';
 import 'package:shoppinglistclient/screens/HomeScreen.dart';
 import 'package:shoppinglistclient/screens/LoadingScreen.dart';
 import 'package:shoppinglistclient/screens/PasswordScreen.dart';
@@ -33,7 +34,8 @@ class MyApp extends ConsumerWidget {
         screen = HomeScreen();
         break;
       default:
-        screen = LoadingScreen();
+        // screen = LoadingScreen();
+        screen = CacheScreen();
         break;
     }
 

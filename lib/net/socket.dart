@@ -8,6 +8,7 @@ import 'package:shoppinglistclient/net/Item.dart';
 import 'package:shoppinglistclient/net/Message.dart';
 import 'package:shoppinglistclient/net/notifiers/ItemsListNotifier.dart';
 import 'package:shoppinglistclient/net/notifiers/SocketStatusNotifier.dart';
+import 'package:shoppinglistclient/net/notifiers/UserActionNotifier.dart';
 import 'package:web_socket_channel/status.dart' as status;
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -30,6 +31,8 @@ enum MessageType {
   REQUEST_UPDATE_ITEM,
   UPDATE_ITEM,
   DISCONNECT,
+  REQUEST_NOT_FOUND_ITEM,
+  NOT_FOUND_ITEM,
 }
 
 enum SocketStatus {
@@ -72,6 +75,34 @@ extension SocketStatusExtension on SocketStatus {
   }
 }
 
+enum EUserAction { ADD_ITEM, REMOVE_ITEM, UPDATE_ITEM, REORDER_ITEM }
+
+extension EUserActionExtension on EUserAction {
+  String get message {
+    switch (this) {
+      case EUserAction.ADD_ITEM:
+        return '%1 ha añadido %2';
+      case EUserAction.REMOVE_ITEM:
+        return '%1 ha eliminado %2';
+      case EUserAction.UPDATE_ITEM:
+        return '%1 ha actualizado %2';
+      case EUserAction.REORDER_ITEM:
+        return '%1 ha reordenado %2';
+    }
+  }
+}
+
+class UserActionNotificationData {
+  final EUserAction action;
+  final List<String> args;
+
+  UserActionNotificationData(this.action, this.args);
+
+  void notify() {
+    userActionNotifier.addNotification(this);
+  }
+}
+
 final socketStatusNotifier = SocketStatusNotifier();
 final _socketStatusProvider =
     StateNotifierProvider<SocketStatusNotifier, SocketStatus>((ref) {
@@ -83,6 +114,17 @@ final _itemsProvider =
     StateNotifierProvider<ItemsListNotifier, List<Item>>((ref) {
   return itemNotifier;
 });
+
+final userActionNotifier = UserActionNotifier();
+final _userActionNotifier =
+    StateNotifierProvider<UserActionNotifier, List<UserActionNotificationData>>(
+        (ref) {
+  return userActionNotifier;
+});
+
+void saveCache() {
+  Cache.setCachedItems(itemNotifier.state.map((e) => e.toJson()).toList());
+}
 
 class ClientSocket {
   WebSocketChannel? channel = null;
@@ -113,20 +155,52 @@ class ClientSocket {
         List<dynamic> items = message.data!['items'];
         List<Item> newItems = items.map((item) => Item.fromJson(item)).toList();
         itemNotifier.refresh(newItems);
+        saveCache();
         break;
       case MessageType.REMOVE_ITEM:
+        UserActionNotificationData(EUserAction.REMOVE_ITEM, [
+          "TODO",
+          itemNotifier.state
+              .firstWhere((i) => i.uuid == message.data!['uuid'])
+              .name
+        ]).notify();
         itemNotifier.removeItem(message.data!['uuid']);
+        saveCache();
         break;
       case MessageType.ADD_ITEM:
-        itemNotifier.addItem(
-            Item.fromJson(message.data!), message.data!["index"]);
+        final item = Item.fromJson(message.data!);
+        itemNotifier.addItem(item, message.data!["index"]);
+
+        UserActionNotificationData(
+            EUserAction.ADD_ITEM, [item.addedBy, item.name]).notify();
+        saveCache();
         break;
       case MessageType.REORDER_ITEM:
         itemNotifier.changeIndex(message.data!['uuid'], message.data!['index']);
+
+        UserActionNotificationData(EUserAction.REORDER_ITEM, [
+          "TODO",
+          itemNotifier.state
+              .firstWhere(
+                (i) => i.uuid == message.data!['uuid'],
+                orElse: () => Item("", "", "", DateTime(2017), null),
+              )
+              .name
+        ]).notify();
+        saveCache();
         break;
       case MessageType.UPDATE_ITEM:
         itemNotifier.changeItem(
             message.data!['uuid'], message.data!['newName']);
+        UserActionNotificationData(
+                EUserAction.REMOVE_ITEM, ["TODO", message.data!['newName']])
+            .notify();
+        saveCache();
+        break;
+      case MessageType.NOT_FOUND_ITEM:
+        itemNotifier.itemNotFound(
+            message.data!['uuid'], message.data!['notFound']);
+        saveCache();
         break;
       case MessageType.PING:
         sendPong();
@@ -207,6 +281,13 @@ class ClientSocket {
     });
   }
 
+  Future<void> sendItemNotFound(Item item, bool notFound) async {
+    await sendMessage(MessageType.REQUEST_NOT_FOUND_ITEM, {
+      'uuid': item.uuid,
+      'notFound': notFound,
+    });
+  }
+
   Future<void> sendMessage(MessageType type,
       [Map<String, dynamic> data = const {}]) async {
     if (!connected) {
@@ -227,6 +308,9 @@ class ClientSocket {
 
   StateNotifierProvider<SocketStatusNotifier, SocketStatus>
       get socketStatusProvider => _socketStatusProvider;
+
+  StateNotifierProvider<UserActionNotifier, List<UserActionNotificationData>>
+      get userActionNotifier => _userActionNotifier;
 
   int getIndexOfItem(Item item) {
     return itemNotifier.state.indexOf(item);
