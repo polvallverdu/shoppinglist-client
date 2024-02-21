@@ -4,4 +4,4 @@ build/
 .vscode/
 android/
 ios/
-.env/
+.env

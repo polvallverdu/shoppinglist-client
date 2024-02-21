@@ -8,11 +8,11 @@ import 'package:shoppinglistclient/screens/CacheScreen.dart';
 import 'package:shoppinglistclient/screens/HomeScreen.dart';
 import 'package:shoppinglistclient/screens/LoadingScreen.dart';
 import 'package:shoppinglistclient/screens/PasswordScreen.dart';
+import 'package:shoppinglistclient/widgets/UserActionNotification.dart';
 import 'package:shoppinglistclient/widgets/SocketStatusDisplay.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
-  await dotenv.load(fileName: ".env");
+  // await dotenv.load(fileName: ".env");
   await DBClient.init();
   ClientSocket().connect();
   runApp(ProviderScope(child: MyApp()));
@@ -52,6 +52,7 @@ class MyApp extends ConsumerWidget {
               child: screen,
             ),
             SocketStatusDisplay(),
+            UserActionNotification(),
           ],
         ),
       ),

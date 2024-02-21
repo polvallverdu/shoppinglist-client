@@ -11,7 +11,6 @@ import 'package:shoppinglistclient/net/notifiers/SocketStatusNotifier.dart';
 import 'package:shoppinglistclient/net/notifiers/UserActionNotifier.dart';
 import 'package:web_socket_channel/status.dart' as status;
 import 'package:web_socket_channel/web_socket_channel.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 enum MessageType {
   CONNECTED,
@@ -218,7 +217,8 @@ class ClientSocket {
 
     socketStatusNotifier.setStatus(SocketStatus.CONNECTING);
 
-    final url = dotenv.get("WEBSOCKET_URL", fallback: "ws://localhost:3000");
+    const url = String.fromEnvironment("WEBSOCKET_URL",
+        defaultValue: "wss://sl.wosher.co/ws");
     channel = WebSocketChannel.connect(Uri.parse(url));
     channel!.stream.listen(_handleMessage,
         cancelOnError: true,
