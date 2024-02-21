@@ -1,12 +1,9 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shoppinglistclient/localDb/DBClient.dart';
 import 'package:shoppinglistclient/net/socket.dart';
 import 'package:shoppinglistclient/screens/CacheScreen.dart';
 import 'package:shoppinglistclient/screens/HomeScreen.dart';
-import 'package:shoppinglistclient/screens/LoadingScreen.dart';
 import 'package:shoppinglistclient/screens/PasswordScreen.dart';
 import 'package:shoppinglistclient/widgets/SocketStatusDisplay.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';

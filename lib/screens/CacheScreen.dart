@@ -22,11 +22,9 @@ class CacheScreen extends ConsumerWidget {
     List<Widget> children = items
         .map((e) => ItemCard(
               item: e,
-              key: Key(e.uuid),
+              key: Key(e.uuid + e.name),
             ))
         .toList();
-
-    print(items);
 
     return Scaffold(
         appBar: AppBar(

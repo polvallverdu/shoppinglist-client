@@ -8,7 +8,6 @@ import 'package:shoppinglistclient/net/Item.dart';
 import 'package:shoppinglistclient/net/Message.dart';
 import 'package:shoppinglistclient/net/notifiers/ItemsListNotifier.dart';
 import 'package:shoppinglistclient/net/notifiers/SocketStatusNotifier.dart';
-import 'package:shoppinglistclient/net/notifiers/UserActionNotifier.dart';
 import 'package:web_socket_channel/status.dart' as status;
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -92,17 +91,6 @@ extension EUserActionExtension on EUserAction {
   }
 }
 
-class UserActionNotificationData {
-  final EUserAction action;
-  final List<String> args;
-
-  UserActionNotificationData(this.action, this.args);
-
-  void notify() {
-    userActionNotifier.addNotification(this);
-  }
-}
-
 final socketStatusNotifier = SocketStatusNotifier();
 final _socketStatusProvider =
     StateNotifierProvider<SocketStatusNotifier, SocketStatus>((ref) {
@@ -113,13 +101,6 @@ final itemNotifier = ItemsListNotifier();
 final _itemsProvider =
     StateNotifierProvider<ItemsListNotifier, List<Item>>((ref) {
   return itemNotifier;
-});
-
-final userActionNotifier = UserActionNotifier();
-final _userActionNotifier =
-    StateNotifierProvider<UserActionNotifier, List<UserActionNotificationData>>(
-        (ref) {
-  return userActionNotifier;
 });
 
 void saveCache() {
@@ -158,12 +139,6 @@ class ClientSocket {
         saveCache();
         break;
       case MessageType.REMOVE_ITEM:
-        UserActionNotificationData(EUserAction.REMOVE_ITEM, [
-          "TODO",
-          itemNotifier.state
-              .firstWhere((i) => i.uuid == message.data!['uuid'])
-              .name
-        ]).notify();
         itemNotifier.removeItem(message.data!['uuid']);
         saveCache();
         break;
@@ -171,30 +146,16 @@ class ClientSocket {
         final item = Item.fromJson(message.data!);
         itemNotifier.addItem(item, message.data!["index"]);
 
-        UserActionNotificationData(
-            EUserAction.ADD_ITEM, [item.addedBy, item.name]).notify();
         saveCache();
         break;
       case MessageType.REORDER_ITEM:
         itemNotifier.changeIndex(message.data!['uuid'], message.data!['index']);
 
-        UserActionNotificationData(EUserAction.REORDER_ITEM, [
-          "TODO",
-          itemNotifier.state
-              .firstWhere(
-                (i) => i.uuid == message.data!['uuid'],
-                orElse: () => Item("", "", "", DateTime(2017), null),
-              )
-              .name
-        ]).notify();
         saveCache();
         break;
       case MessageType.UPDATE_ITEM:
         itemNotifier.changeItem(
             message.data!['uuid'], message.data!['newName']);
-        UserActionNotificationData(
-                EUserAction.REMOVE_ITEM, ["TODO", message.data!['newName']])
-            .notify();
         saveCache();
         break;
       case MessageType.NOT_FOUND_ITEM:
@@ -308,9 +269,6 @@ class ClientSocket {
 
   StateNotifierProvider<SocketStatusNotifier, SocketStatus>
       get socketStatusProvider => _socketStatusProvider;
-
-  StateNotifierProvider<UserActionNotifier, List<UserActionNotificationData>>
-      get userActionNotifier => _userActionNotifier;
 
   int getIndexOfItem(Item item) {
     return itemNotifier.state.indexOf(item);

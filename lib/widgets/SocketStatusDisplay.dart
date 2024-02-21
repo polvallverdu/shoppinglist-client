@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shoppinglistclient/net/socket.dart';
-import 'package:stroke_text/stroke_text.dart';
 
 class SocketStatusDisplay extends HookConsumerWidget {
   const SocketStatusDisplay({Key? key}) : super(key: key);
